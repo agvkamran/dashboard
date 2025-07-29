@@ -1,17 +1,16 @@
 //@ts-ignore
 import { RootState } from "@/app";
-import { useSelector, useDispatch } from "react-redux";
-import { clearSelectedUser } from "@/features/user/model/slice";
+import { useSelector } from "react-redux";
 
-export const UserModal = () => {
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.userInfo.selectedUser);
+interface UserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-  if (!user) return null;
+export const UserModal = ({ isOpen, onClose }: UserModalProps) => {
+  const user = useSelector((state: RootState) => state.user.selectedUser);
 
-  const handleClose = () => {
-    dispatch(clearSelectedUser());
-  };
+  if (!isOpen || !user) return null;
 
   return (
     <div
@@ -49,7 +48,7 @@ export const UserModal = () => {
         </h2>
         <p>{user.email}</p>
 
-        <button onClick={handleClose} style={{ marginTop: "10px" }}>
+        <button onClick={onClose} style={{ marginTop: "10px" }}>
           Закрыть
         </button>
       </div>

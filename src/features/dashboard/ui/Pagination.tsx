@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { RootState, AppDispatch } from "@/app/store";
 import { fetchUsersThunk } from "../model/thunks";
 
@@ -8,11 +9,14 @@ export const Pagination = () => {
     (state: RootState) => state.dashboard
   );
 
+  const [params, setParams] = useSearchParams();
+
   if (totalPages === 0) return null;
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       dispatch(fetchUsersThunk(page));
+      setParams({ ...Object.fromEntries(params), page: page.toString() });
     }
   };
 

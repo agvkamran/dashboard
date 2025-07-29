@@ -6,27 +6,64 @@ import { Pagination } from "./Pagination";
 import { UserModal } from "@/features/user/ui/UserModal";
 import { setSelectedUser } from "@/features/user/model/slice";
 import { useDebounce } from "@/shared/lib/hooks/useDebounce";
+import { useSearchParams } from "react-router-dom";
 
 const DashboardPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { users, isLoading, error } = useSelector(
     (state: RootState) => state.dashboard
   );
-  const [searchTerm, setSearchTerm] = useState("");
+  const selectedUser = useSelector(
+    (state: RootState) => state.user.selectedUser
+  );
+
+  const [params, setParams] = useSearchParams();
+  const page = Number(params.get("page") || 1);
+  const searchTermFromUrl = params.get("search") || "";
+  const userIdFromUrl = params.get("userId");
+
+  const [searchTerm, setSearchTerm] = useState(searchTermFromUrl);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setParams({ search: value, page: "1" });
+  };
+
   useEffect(() => {
-    dispatch(fetchUsersThunk(1));
-  }, [dispatch]);
+    dispatch(fetchUsersThunk(page));
+  }, [dispatch, page]);
+
+  useEffect(() => {
+    if (userIdFromUrl && users.length > 0) {
+      const foundUser = users.find((u) => u.id.toString() === userIdFromUrl);
+      if (foundUser) {
+        dispatch(setSelectedUser(foundUser));
+      }
+    }
+  }, [userIdFromUrl, users, dispatch]);
+
+  const handleCloseModal = () => {
+    dispatch(setSelectedUser(null));
+    const updatedParams = Object.fromEntries(params);
+    delete updatedParams.userId;
+    setParams(updatedParams);
+  };
 
   const filteredUsers = useMemo(() => {
-    if (!debouncedSearchTerm.trim()) return users;
+    const search = debouncedSearchTerm.toLowerCase().trim();
+    if (!search) return users;
 
     return users.filter((user) => {
       const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      const reversedFullName = `${user.last_name} ${user.first_name}`.toLowerCase();
+      const email = user.email.toLowerCase();
+
       return (
-        fullName.includes(debouncedSearchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+        fullName.includes(search) ||
+        reversedFullName.includes(search) ||
+        email.includes(search)
       );
     });
   }, [users, debouncedSearchTerm]);
@@ -42,17 +79,25 @@ const DashboardPage = () => {
         type="text"
         placeholder="Поиск пользователей..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleSearchChange}
         style={{ marginBottom: "20px", padding: "8px", width: "100%" }}
       />
 
       <ul
-        style={{ display: "grid", gap: "10px", listStyle: "none", padding: 0 }}
+        style={{
+          display: "grid",
+          gap: "10px",
+          listStyle: "none",
+          padding: 0,
+        }}
       >
         {filteredUsers.map((user) => (
           <li
             key={user.id}
-            onClick={() => dispatch(setSelectedUser(user))}
+            onClick={() => {
+              dispatch(setSelectedUser(user));
+              setParams({ ...Object.fromEntries(params), userId: user.id.toString() });
+            }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -82,7 +127,7 @@ const DashboardPage = () => {
         ))}
       </ul>
 
-      <UserModal />
+      <UserModal isOpen={!!selectedUser} onClose={handleCloseModal} />
       <Pagination />
     </div>
   );
