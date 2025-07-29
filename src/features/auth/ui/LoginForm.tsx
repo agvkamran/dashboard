@@ -18,7 +18,6 @@ export const LoginForm = () => {
   const { isLoading, error, user } = useSelector(
     (state: RootState) => state.auth
   );
-  console.log(user)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -8,6 +8,7 @@ import LoginPage from "@/pages/LoginPage";
 // import DashboardPage from "@/pages/DashboardPage";
 import { PublicRoute } from "@/shared/routes/PublicRoute";
 import { PrivateRoute } from "@/shared/routes/PrivateRoute";
+import DashboardPage from "@/pages/DashboardPage";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,7 +36,7 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              {/* <DashboardPage /> */}
+              <DashboardPage />
             </PrivateRoute>
           }
         />

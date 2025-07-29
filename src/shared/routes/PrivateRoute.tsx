@@ -9,7 +9,6 @@ interface Props {
 }
 
 export const PrivateRoute = ({ children }: Props) => {
-    console.log('children' , children)
   const dispatch = useDispatch();
   const location = useLocation();
   const { accessToken } = useSelector((state: RootState) => state.auth);

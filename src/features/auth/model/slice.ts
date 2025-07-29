@@ -20,14 +20,14 @@ const initialState: AuthState = {
   refreshToken: null,
   isLoading: false,
   error: null,
-  authIsReady: false
+  authIsReady: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout(state){
+    logout(state) {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
@@ -35,7 +35,7 @@ const authSlice = createSlice({
       state.isLoading = false;
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
