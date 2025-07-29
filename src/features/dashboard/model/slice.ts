@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchUsersThunk } from "./thunks";
 
-interface User {
+export interface IUser {
   id: number;
   email: string;
   first_name: string;
@@ -10,7 +10,7 @@ interface User {
 }
 
 interface DashboardState {
-  users: User[];
+  users: IUser[];
   isLoading: boolean;
   error: string | null;
   totalPages: number;

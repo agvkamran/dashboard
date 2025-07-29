@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersThunk } from "@/features/dashboard/model/thunks";
 import { RootState, AppDispatch } from "@/app/store";
 import { Pagination } from "./Pagination";
+import { UserModal } from "@/features/user/ui/UserModal";
+import { setSelectedUser } from "@/features/user/model/slice";
 
 const DashboardPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { users, isLoading, error, totalPages, currentPage} = useSelector(
+  const { users, isLoading, error } = useSelector(
     (state: RootState) => state.dashboard
   );
   useEffect(() => {
@@ -19,13 +21,13 @@ const DashboardPage = () => {
 
       {isLoading && <p>Загрузка пользователей...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-
       <ul
         style={{ display: "grid", gap: "10px", listStyle: "none", padding: 0 }}
       >
         {users.map((user) => (
           <li
             key={user.id}
+            onClick={() => dispatch(setSelectedUser(user))}
             style={{
               display: "flex",
               alignItems: "center",
@@ -33,6 +35,7 @@ const DashboardPage = () => {
               padding: "10px",
               border: "1px solid #ccc",
               borderRadius: "8px",
+              cursor: "pointer"
             }}
           >
             <img
@@ -53,7 +56,8 @@ const DashboardPage = () => {
           </li>
         ))}
       </ul>
-    <Pagination />
+      <UserModal />
+      <Pagination />
     </div>
   );
 };
